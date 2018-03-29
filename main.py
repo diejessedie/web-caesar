@@ -1,6 +1,12 @@
 from flask import Flask, request, redirect
 from caesar import rotate_string
 import cgi
+import os
+import jinja2
+
+template_dir = os.path.join(os.path.dirname(__file__), 'templates')
+jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir), autoescape=True)
+
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -51,9 +57,12 @@ def encrypt():
 
     rot = int(rot)
     text = request.form["text"]
+    
     rotated = rotate_string(text, rot)
 
-    return form.format(rotated)
+    template = jinja_env.get_template('caesar-form.html')
+        
+    return template.render(rotated=rotated)
     
 
 @app.route("/")
@@ -66,8 +75,8 @@ def index():
     else:
         error_element = ''
     
-    
-    
-    return form.format('') + error_element
+    template = jinja_env.get_template('caesar-form.html')
+        
+    return template.render() + error_element
 
 app.run()
